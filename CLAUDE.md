@@ -31,8 +31,8 @@ Create `.env.local`:
 # Project API key (public, can be exposed in frontend)
 VITE_SUBSCRIBEDEV_PUBLIC_API_KEY=your_project_token
 
-# Owner access token (dev-only, for automatic authentication)
-VITE_DEV_ACCESS_TOKEN=your_access_token_here
+# Local access token (dev-only, for automatic authentication)
+VITE_SUBSCRIBEDEV_LOCAL_ACCESS_TOKEN=your_access_token_here
 ```
 
 Get your project token at [platform.subscribe.dev](https://platform.subscribe.dev).
@@ -69,7 +69,7 @@ Create `.env.local` (already shown above) with both tokens.
 ```bash
 # .env.local.example
 VITE_SUBSCRIBEDEV_PUBLIC_API_KEY=
-VITE_DEV_ACCESS_TOKEN=
+VITE_SUBSCRIBEDEV_LOCAL_ACCESS_TOKEN=
 ```
 
 **Step 4: Update Provider in `main.tsx`**
@@ -77,14 +77,14 @@ VITE_DEV_ACCESS_TOKEN=
 ```typescript
 import { SubscribeDevProvider } from '@subscribe.dev/react'
 
-// Get dev access token (dev-only, tree-shaken in production)
-const devAccessToken = import.meta.env.DEV
-  ? import.meta.env.VITE_DEV_ACCESS_TOKEN
+// Get local access token (dev-only, tree-shaken in production)
+const localAccessToken = import.meta.env.DEV
+  ? import.meta.env.VITE_SUBSCRIBEDEV_LOCAL_ACCESS_TOKEN
   : undefined;
 
 <SubscribeDevProvider
   projectToken={import.meta.env.VITE_SUBSCRIBEDEV_PUBLIC_API_KEY}
-  accessToken={devAccessToken}
+  accessToken={localAccessToken}
 >
   <App />
 </SubscribeDevProvider>
