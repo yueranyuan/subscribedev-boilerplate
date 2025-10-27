@@ -26,14 +26,77 @@ bun run dev  # Vite auto-selects available port
 
 ### Environment Variables
 
-Create `.env`:
-```
+Create `.env.local`:
+```bash
+# Project API key (public, can be exposed in frontend)
 VITE_SUBSCRIBEDEV_PUBLIC_API_KEY=your_project_token
+
+# Owner access token (dev-only, for automatic authentication)
+VITE_DEV_ACCESS_TOKEN=your_access_token_here
 ```
 
 Get your project token at [platform.subscribe.dev](https://platform.subscribe.dev).
 
 Without a token, the app runs in demo mode with limited functionality.
+
+### Automatic Authentication Setup (AI Agents with MCP Access Only)
+
+> **Note**: This section applies ONLY if you have access to the Subscribe.dev MCP (Model Context Protocol) tools. Manual developers should get tokens through the dashboard.
+
+For local development, set up automatic authentication so you don't have to manually sign in every time:
+
+**Step 1: Get Owner Access Token via MCP**
+
+```typescript
+// Call the MCP tool with your project ID:
+subscribe_dev_get_owner_access_token({ projectId: "your-project-id" })
+
+// Or without arguments to use the first available project:
+subscribe_dev_get_owner_access_token({})
+```
+
+**Step 2: Get Project API Key via MCP**
+
+```typescript
+subscribe_dev_get_project_api_key({ projectId: "your-project-id" })
+```
+
+**Step 3: Add to `.env.local`**
+
+Create `.env.local` (already shown above) with both tokens.
+
+**Important**: Also create `.env.local.example` template:
+```bash
+# .env.local.example
+VITE_SUBSCRIBEDEV_PUBLIC_API_KEY=
+VITE_DEV_ACCESS_TOKEN=
+```
+
+**Step 4: Update Provider in `main.tsx`**
+
+```typescript
+import { SubscribeDevProvider } from '@subscribe.dev/react'
+
+// Get dev access token (dev-only, tree-shaken in production)
+const devAccessToken = import.meta.env.DEV
+  ? import.meta.env.VITE_DEV_ACCESS_TOKEN
+  : undefined;
+
+<SubscribeDevProvider
+  projectToken={import.meta.env.VITE_SUBSCRIBEDEV_PUBLIC_API_KEY}
+  accessToken={devAccessToken}
+>
+  <App />
+</SubscribeDevProvider>
+```
+
+**Benefits:**
+- ✅ Instant authentication on dev server start
+- ✅ No manual OAuth required
+- ✅ Works across dev server restarts
+- ✅ Zero risk of production leakage (tree-shaken)
+
+**For Production:** Only use `projectToken` (no `accessToken`). Users authenticate via normal OAuth.
 
 ## Core API
 
