@@ -4,25 +4,22 @@ Minimal React app for AI-powered applications with built-in auth, billing, and r
 
 ## Stack
 
-- React 18 + TypeScript + Vite
+- React 18 + TypeScript + Bun
 - @subscribe.dev/react ^0.0.240
-- Bun package manager
+- Bun bundler & runtime
 
 ## Setup
 
 ```bash
-cd samples/boilerplate
 bun install
-bun run dev  # Vite auto-selects available port
+bun run dev  # Starts on port 3000
 ```
 
-**Important:** Vite automatically finds an available port (default 5173, auto-increments if busy). **Always check the terminal output** for the actual port:
+**Important:** The Bun dev server runs on port 3000 by default. Check the terminal output to confirm:
 
 ```
-➜  Local:   http://localhost:5174/
+🚀 Server running at http://localhost:3000
 ```
-
-**For AI agents:** Only use ports that YOU started. Other Vite servers may be running in different repos/worktrees on this machine. Parse the `bun run dev` output to extract YOUR port number before accessing the app.
 
 ### Environment Variables
 
@@ -31,7 +28,7 @@ Create `.env.local`:
 # Project API key (public, can be exposed in frontend)
 VITE_SUBSCRIBEDEV_PUBLIC_API_KEY=your_project_token
 
-# Local access token (dev-only, for automatic authentication)
+# Optional: Local access token (dev-only, for automatic authentication)
 VITE_SUBSCRIBEDEV_LOCAL_ACCESS_TOKEN=your_access_token_here
 ```
 
@@ -39,64 +36,11 @@ Get your project token at [platform.subscribe.dev](https://platform.subscribe.de
 
 Without a token, the app runs in demo mode with limited functionality.
 
-### Automatic Authentication Setup (AI Agents with MCP Access Only)
+**🔒 SECURITY:**
+- `VITE_SUBSCRIBEDEV_PUBLIC_API_KEY` - Safe to expose, included in production builds
+- `VITE_SUBSCRIBEDEV_LOCAL_ACCESS_TOKEN` - **Only** injected in dev server (`bun run dev`), **never** in production builds (`bun run build`)
 
-> **Note**: This section applies ONLY if you have access to the Subscribe.dev MCP (Model Context Protocol) tools. Manual developers should get tokens through the dashboard.
-
-For local development, set up automatic authentication so you don't have to manually sign in every time:
-
-**Step 1: Get Owner Access Token via MCP**
-
-```typescript
-// Call the MCP tool with your project ID:
-subscribe_dev_get_owner_access_token({ projectId: "your-project-id" })
-
-// Or without arguments to use the first available project:
-subscribe_dev_get_owner_access_token({})
-```
-
-**Step 2: Get Project API Key via MCP**
-
-```typescript
-subscribe_dev_get_project_api_key({ projectId: "your-project-id" })
-```
-
-**Step 3: Add to `.env.local`**
-
-Create `.env.local` (already shown above) with both tokens.
-
-**Important**: Also create `.env.local.example` template:
-```bash
-# .env.local.example
-VITE_SUBSCRIBEDEV_PUBLIC_API_KEY=
-VITE_SUBSCRIBEDEV_LOCAL_ACCESS_TOKEN=
-```
-
-**Step 4: Update Provider in `main.tsx`**
-
-```typescript
-import { SubscribeDevProvider } from '@subscribe.dev/react'
-
-// Get local access token (dev-only, tree-shaken in production)
-const localAccessToken = import.meta.env.DEV
-  ? import.meta.env.VITE_SUBSCRIBEDEV_LOCAL_ACCESS_TOKEN
-  : undefined;
-
-<SubscribeDevProvider
-  projectToken={import.meta.env.VITE_SUBSCRIBEDEV_PUBLIC_API_KEY}
-  accessToken={localAccessToken}
->
-  <App />
-</SubscribeDevProvider>
-```
-
-**Benefits:**
-- ✅ Instant authentication on dev server start
-- ✅ No manual OAuth required
-- ✅ Works across dev server restarts
-- ✅ Zero risk of production leakage (tree-shaken)
-
-**For Production:** Only use `projectToken` (no `accessToken`). Users authenticate via normal OAuth.
+The local access token enables automatic dev authentication but is excluded from production builds to prevent accidental deployment.
 
 ## Core API
 
@@ -266,8 +210,9 @@ src/
 ├── main.tsx             # React entry
 └── index.css            # Minimal styles
 
+server.ts                # Bun dev server
+build.ts                 # Production build script
 index.html               # HTML template
-vite.config.ts           # Vite config
 package.json             # Dependencies
 ```
 
@@ -323,13 +268,23 @@ function MyComponent() {
 
 ## Build & Deploy
 
+**Build for production:**
+
 ```bash
+# Set your project token before building
+export VITE_SUBSCRIBEDEV_PUBLIC_API_KEY=your_project_token
 bun run build  # Output: dist/
 ```
 
-Deploy `dist/` to any static host (Vercel, Netlify, Cloudflare Pages, etc).
+The build script (`build.ts`) will inject your project token at build time. The token is **baked into the bundle** and safe to expose - it only allows authenticated users to access your app.
 
-**Important:** Your project token is public and safe to expose. It only allows authenticated users to access your app.
+**Deployment platforms:**
+
+- **Vercel/Netlify/Cloudflare Pages:** Set `VITE_SUBSCRIBEDEV_PUBLIC_API_KEY` in your dashboard's environment variables
+- **Docker/VPS:** Set the env var in your CI/CD pipeline or build script
+- **Static hosts:** Build locally with the env var set, then deploy the `dist/` folder
+
+⚠️ **Important:** The environment variable must be set at **build time**, not runtime. Static deployments bake the values into the JavaScript bundle.
 
 ## Advanced Features
 
@@ -379,7 +334,7 @@ const response = await client.run('openai/gpt-4o', {
 
 ## Common Issues
 
-**Wrong port:** Never assume port 5173. Always parse the `bun run dev` output to find YOUR actual port. Multiple Vite servers may be running on this machine in different worktrees/repos.
+**Wrong port:** The Bun dev server always runs on port 3000 (or PORT env var). Check the terminal output to confirm.
 
 **Demo mode limitations:** Without a project token, users can't persist data or manage subscriptions.
 
