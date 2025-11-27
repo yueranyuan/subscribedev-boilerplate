@@ -5,10 +5,69 @@ Minimal React app for AI-powered applications with built-in auth, billing, and r
 ## Stack
 
 - React 18 + TypeScript + Bun
-- @subscribe.dev/react ^0.0.240
-- Bun bundler & runtime
+- @subscribe.dev/react ^0.1.14
+- Bun bundler & runtime (NOT Vite - uses custom Bun dev server)
 
-## Setup
+## 🤖 AGENT SETUP (CRITICAL - DO THIS FIRST!)
+
+**If you are an AI agent setting up this project, you MUST complete these steps BEFORE writing any application code:**
+
+### Step 1: Create a Subscribe.dev Project
+
+Use the Subscribe.dev MCP tools to create a demo project:
+
+```typescript
+// Use: mcp__subscribe-dev__create_project
+{
+  "name": "Your Project Name",
+  "type": "demo",  // Use "demo" for testing, "dev" for development, "production" for live apps
+  "description": "Brief description of what this app does"
+}
+```
+
+This returns a project with an API key (starts with `pub_`). Save this for the next step.
+
+### Step 2: Get the Owner Access Token
+
+Use the MCP tool to get an owner access token for local development:
+
+```typescript
+// Use: mcp__subscribe-dev__get_owner_access_token
+{
+  "projectId": "the-project-id-from-step-1"
+}
+```
+
+This returns a JWT access token that allows automatic authentication during development.
+
+### Step 3: Create Environment Files
+
+Create `.env.local` with BOTH keys:
+
+```bash
+# Project API key (public, can be exposed in frontend)
+VITE_SUBSCRIBEDEV_PUBLIC_API_KEY=pub_xxxxxxxxxxxxx
+
+# Local access token (dev-only, for automatic authentication)
+VITE_SUBSCRIBEDEV_LOCAL_ACCESS_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**⚠️ CRITICAL:** Both keys must be set before running the dev server! The app will not function properly without them.
+
+### Step 4: Verify Setup
+
+After creating the environment file, verify the keys are loaded:
+
+1. Run `bun install` to install dependencies
+2. Run `bun run dev` to start the dev server
+3. Check the console output for: `📌 Public API Key: ✓ Set`
+4. Open the app in a browser - you should be automatically authenticated
+
+**Only proceed with implementing the application features after completing these setup steps!**
+
+---
+
+## Manual Setup (for human developers)
 
 ```bash
 bun install
@@ -42,6 +101,8 @@ Without a token, the app runs in demo mode with limited functionality.
 
 The local access token enables automatic dev authentication but is excluded from production builds to prevent accidental deployment.
 
+**Note on `VITE_` prefix:** This project uses Bun (not Vite), but maintains the `VITE_` naming convention for environment variables for familiarity and compatibility. The Bun dev server and build script use `define` to inject these values at build time.
+
 ## Core API
 
 ### Provider Setup
@@ -49,10 +110,15 @@ The local access token enables automatic dev authentication but is excluded from
 ```tsx
 import { SubscribeDevProvider } from '@subscribe.dev/react'
 
-<SubscribeDevProvider projectToken={import.meta.env.VITE_SUBSCRIBEDEV_PUBLIC_API_KEY}>
+<SubscribeDevProvider
+  projectToken={import.meta.env.VITE_SUBSCRIBEDEV_PUBLIC_API_KEY}
+  accessToken={import.meta.env.VITE_SUBSCRIBEDEV_LOCAL_ACCESS_TOKEN}
+>
   <App />
 </SubscribeDevProvider>
 ```
+
+**Note:** The `accessToken` prop enables automatic authentication in development. This token is only available during `bun run dev` and is explicitly set to `undefined` in production builds for security.
 
 ### Hook: useSubscribeDev()
 
@@ -268,6 +334,34 @@ function MyComponent() {
 
 ## Build & Deploy
 
+### 🚀 Recommended: Deploy via Subscribe.dev MCP (Agents)
+
+**If you are an AI agent, use the Subscribe.dev MCP deployment tool:**
+
+```typescript
+// Use: mcp__subscribe-dev__deploy_content
+{
+  "projectId": "your-project-id",
+  "content": "file:///absolute/path/to/dist.zip"  // or path to index.html
+}
+```
+
+**Steps:**
+1. Build the project: `bun run build` (creates `dist/` folder)
+2. Zip the dist folder if deploying multiple files, or use the index.html directly
+3. Call `mcp__subscribe-dev__deploy_content` with the project ID and file path
+4. Tool returns a live public URL (e.g., `https://abc123.apps.subscribe.dev`)
+
+**Benefits:**
+- ✅ Instant deployment with public HTTPS URL
+- ✅ No external hosting setup required
+- ✅ Perfect for demos, prototypes, and testing
+- ✅ Works seamlessly with Subscribe.dev auth and billing
+
+---
+
+### Manual Deployment (Human Developers)
+
 **Build for production:**
 
 ```bash
@@ -280,6 +374,7 @@ The build script (`build.ts`) will inject your project token at build time. The 
 
 **Deployment platforms:**
 
+- **Subscribe.dev (recommended):** Use the platform dashboard to deploy
 - **Vercel/Netlify/Cloudflare Pages:** Set `VITE_SUBSCRIBEDEV_PUBLIC_API_KEY` in your dashboard's environment variables
 - **Docker/VPS:** Set the env var in your CI/CD pipeline or build script
 - **Static hosts:** Build locally with the env var set, then deploy the `dist/` folder

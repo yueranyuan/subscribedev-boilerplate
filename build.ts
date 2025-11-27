@@ -14,7 +14,8 @@ const result = await Bun.build({
     "import.meta.env.VITE_SUBSCRIBEDEV_PUBLIC_API_KEY": JSON.stringify(
       process.env.VITE_SUBSCRIBEDEV_PUBLIC_API_KEY || ""
     ),
-    // NEVER inject LOCAL_ACCESS_TOKEN in production builds
+    // NEVER inject LOCAL_ACCESS_TOKEN in production builds - set to undefined
+    "import.meta.env.VITE_SUBSCRIBEDEV_LOCAL_ACCESS_TOKEN": "undefined",
     "import.meta.env.DEV": "false",
     "import.meta.env.MODE": JSON.stringify("production"),
     "import.meta.env.PROD": "true",
@@ -36,3 +37,11 @@ for (const output of result.outputs) {
   const size = (output.size / 1024).toFixed(2);
   console.log(`   ${output.path.replace(process.cwd(), ".")} - ${size} KB`);
 }
+
+// Copy and update index.html to reference built files
+const html = await Bun.file("./index.html").text();
+const updatedHtml = html
+  .replace('/src/index.css', '/main.css')
+  .replace('/src/main.tsx', '/main.js');
+await Bun.write("./dist/index.html", updatedHtml);
+console.log("   ./dist/index.html - copied and updated")

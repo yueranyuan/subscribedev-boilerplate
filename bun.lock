@@ -4,7 +4,7 @@
     "": {
       "name": "boilerplate",
       "dependencies": {
-        "@subscribe.dev/react": "^0.0.240",
+        "@subscribe.dev/react": "^0.1.14",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
       },
@@ -62,9 +62,9 @@
 
     "@nodelib/fs.walk": ["@nodelib/fs.walk@1.2.8", "", { "dependencies": { "@nodelib/fs.scandir": "2.1.5", "fastq": "^1.6.0" } }, "sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg=="],
 
-    "@subscribe.dev/client": ["@subscribe.dev/client@0.0.83", "", { "dependencies": { "@clerk/clerk-react": "^5.37.0", "@tanstack/react-query": "^5.83.0", "eventemitter3": "^5.0.1", "openai": "^5.12.2", "p-queue": "^7.4.1", "p-retry": "^5.1.2", "zod": "^4.0.17", "zustand": "^5.0.6" } }, "sha512-KC3P6Ohp5fkThT3WcXpmzJEidVKQJYGSKMWGWSDez66nqvqsa/GKm+JEycw+EXfS6R/PMs/0SSDUjN/4/AEFyg=="],
+    "@subscribe.dev/client": ["@subscribe.dev/client@0.0.109", "", { "dependencies": { "@clerk/clerk-react": "^5.37.0", "@tanstack/react-query": "^5.83.0", "eventemitter3": "^5.0.1", "openai": "^5.12.2", "p-queue": "^7.4.1", "p-retry": "^5.1.2", "zod": "^4.0.17", "zustand": "^5.0.6" } }, "sha512-MEGJaV8y/tA7VQ1PPf9kdyXZyqTOjGBok8TGAtGeNzqiUBsQk/mhTXkXEgxQlGF8CFfWoU9oI1QcJoFG9N7Qhg=="],
 
-    "@subscribe.dev/react": ["@subscribe.dev/react@0.0.240", "", { "dependencies": { "@subscribe.dev/client": "^0.0.83", "@tanstack/react-query": "^5.0.0", "zustand": "^4.5.0" }, "peerDependencies": { "@tanstack/react-query": "^5.0.0", "react": "^18.0.0 || ^19.0.0" } }, "sha512-psdtCW4SauywP6ZHxMVHrzH/AmNRZFX5Qm1KSC6E3PYPDJhmsN9G55G+eKfkywxgjG9902X+H6UXcHt5sjV+wA=="],
+    "@subscribe.dev/react": ["@subscribe.dev/react@0.1.14", "", { "dependencies": { "@subscribe.dev/client": "^0.0.109", "@tanstack/react-query": "^5.0.0", "zustand": "^4.5.0" }, "peerDependencies": { "react": "^18.0.0 || ^19.0.0" } }, "sha512-EEmkF88Dzc9yGiSdxprDkyrXhDQDyHS1Mz4vhmiHveWNTyI1FMjEeDqPbXPk1fEjKExCSzBEAZdiK+VDhY0fKQ=="],
 
     "@tanstack/query-core": ["@tanstack/query-core@5.90.2", "", {}, "sha512-k/TcR3YalnzibscALLwxeiLUub6jN5EDLwKDiO7q5f4ICEoptJ+n9+7vcEFy5/x/i6Q+Lb/tXrsKCggf5uQJXQ=="],
 
