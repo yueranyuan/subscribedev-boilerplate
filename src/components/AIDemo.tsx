@@ -82,46 +82,47 @@ function AIDemo() {
     }
   }
 
-  return (
-    <div className="container">
-      <div className="header">
-        <h1>Subscribe.dev Boilerplate</h1>
-        {showSignInPrompt ? (
+  // Show sign in prompt if not signed in
+  if (showSignInPrompt) {
+    return (
+      <div className="container">
+        <div className="sign-in-prompt">
+          <h1>Subscribe.dev Boilerplate</h1>
+          <p>A minimal React boilerplate for building AI-powered apps with built-in authentication, billing, and rate limiting.</p>
           <button onClick={signIn} className="button">
             Sign In
           </button>
-        ) : (
-          <div className="user-info">
-            {user?.avatarUrl && (
-              <img src={user.avatarUrl} alt="Avatar" className="avatar" />
-            )}
-            <span>{user?.email}</span>
-            <button onClick={signOut} className="button">
-              Sign Out
-            </button>
-          </div>
-        )}
+        </div>
       </div>
+    )
+  }
 
-      {usage && (
-        <div className="usage-info">
-          <div className="usage-item">
-            <span>Credits Used:</span>
-            <span>{usage.usedCredits}</span>
-          </div>
-          <div className="usage-item">
-            <span>Credits Remaining:</span>
-            <span>{usage.remainingCredits}</span>
-          </div>
+  return (
+    <div className="container">
+      <div className="header">
+        <div className="header-left">
+          {user?.avatarUrl && (
+            <img src={user.avatarUrl} alt="Avatar" className="avatar" />
+          )}
+        </div>
+        <div className="header-right">
+          {usage && (
+            <div className="credits">
+              Credits: {usage.remainingCredits} / {(usage as any).allocatedCredits}
+            </div>
+          )}
           {subscriptionStatus?.hasActiveSubscription ? (
-            <span>Active: {subscriptionStatus.plan?.name}</span>
+            <span className="subscription-badge">Active: {subscriptionStatus.plan?.name}</span>
           ) : (
             <button onClick={subscribe} className="button">
               Subscribe
             </button>
           )}
+          <button onClick={signOut} className="button button-secondary">
+            Sign Out
+          </button>
         </div>
-      )}
+      </div>
 
       <div className="demo-section">
         <h2>AI Text Generation</h2>
